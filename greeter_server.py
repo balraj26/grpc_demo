@@ -40,7 +40,16 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
 
     def SayHelloBidiStream(self, request_iterator, context):
         for request in request_iterator:
-            yield helloworld_pb2.HelloReply(message=f"Hello, {request.name}!")
+            if request.name == 'Alice':
+                message = f"Hello, Astronaut {request.name}!"
+            elif request.name == 'Bob':
+                message = f"Hello, Doctor {request.name}!"
+            elif request.name == 'Charlie':
+                message = f"Hello, Plumber {request.name}!"
+            else:
+                message = f"Hello, {request.name}!"
+            yield helloworld_pb2.HelloReply(message=message)
+
 
 
 def serve():
