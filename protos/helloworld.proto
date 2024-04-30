@@ -26,9 +26,9 @@ service Greeter {
   //  Unary RPC
   rpc SayHello (HelloRequest) returns (HelloReply) {}
   //Server streaming
-  rpc SayHelloStreamReply (HelloRequest) returns (stream HelloReply) {}
+  rpc SayHelloStreamServer (HelloRequest) returns (stream HelloReply) {}
   //Client streaming
-  rpc SayHelloStreamRequest (stream HelloRequest) returns (HelloReply) {}
+  rpc SayHelloStreamClient (stream HelloRequest) returns (HelloReply) {}
   //Bidirectional streaming
   rpc SayHelloBidiStream (stream HelloRequest) returns (stream HelloReply) {}
 }

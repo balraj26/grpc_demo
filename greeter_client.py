@@ -29,30 +29,46 @@ def run():
     print("Will try to greet world ...")
     with grpc.insecure_channel("localhost:50051") as channel:
         stub = helloworld_pb2_grpc.GreeterStub(channel)
+        request_type = int(input("Please enter the number corresponding to the request type you want to make:\n1. "
+                                 "Unary RPC\n2. Server Streaming\n3. Client Streaming\n4. Bidirectional Streaming\n"))
+        if request_type == 1:
+            # Single request
+            name = input("Enter your name:\n")
+            response = stub.SayHello(helloworld_pb2.HelloRequest(name=name))
+            print("Greeter client received:", response.message)
 
-        # Single request
-        response = stub.SayHello(helloworld_pb2.HelloRequest(name="Ballu"))
-        print("Greeter client received:", response.message)
+        elif request_type == 2:
+            # Server streaming
+            name = input("Enter your name:\n")
+            response_stream = stub.SayHelloStreamServer(helloworld_pb2.HelloRequest(name=name))
+            for reply in response_stream:
+                print("Server stream response received:", reply.message)
 
-        # Server streaming
-        response_stream = stub.SayHelloStreamReply(helloworld_pb2.HelloRequest(name='Alice'))
-        for reply in response_stream:
-            print("Server stream response received:", reply.message)
+        elif request_type == 3:
+            # Client streaming
+            requests_number = int(input("Enter number of requests to be made:\n"))
+            names = []
+            for i in range(requests_number):
+                name = input("Enter you name:\n")
+                names.append(name)
+            client_stream_requests = (helloworld_pb2.HelloRequest(name=name) for name in names)
+            client_stream_response = stub.SayHelloStreamClient(client_stream_requests)
+            print("Client stream response received:", client_stream_response.message)
 
-        # Client streaming
-        names = ["Alice", "Bob", "Charlie"]
-        client_stream_requests = (helloworld_pb2.HelloRequest(name=name) for name in names)
-        client_stream_response = stub.SayHelloStreamRequest(client_stream_requests)
-        print("Client stream response received:", client_stream_response.message)
-
-        # Bidirectional Streaming
-        # Create a stream of HelloRequest messages
-        bidi_requests = (helloworld_pb2.HelloRequest(name=name) for name in ["Alice", "Bob", "Charlie"])
-        # Call the SayHelloBidiStream method with the stream of requests
-        bidi_response_stream = stub.SayHelloBidiStream(bidi_requests)
-        # Iterate over the response stream and print each message received from the server
-        for response in bidi_response_stream:
-            print("Bidi stream response Received:", response.message)
+        elif request_type == 4:
+            # Bidirectional Streaming
+            # Create a stream of HelloRequest messages
+            requests_number = int(input("Enter number of requests to be made:\n"))
+            names = []
+            for i in range(requests_number):
+                name = input("Enter your name:\n")
+                names.append(name)
+            bidi_requests = (helloworld_pb2.HelloRequest(name=name) for name in names)
+            # Call the SayHelloBidiStream method with the stream of requests
+            bidi_response_stream = stub.SayHelloBidiStream(bidi_requests)
+            # Iterate over the response stream and print each message received from the server
+            for response in bidi_response_stream:
+                print("Bidi stream response Received:", response.message)
 
 
 if __name__ == "__main__":

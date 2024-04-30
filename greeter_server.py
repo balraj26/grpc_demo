@@ -26,30 +26,24 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
         return helloworld_pb2.HelloReply(message="Hello, %s!" % request.name)
 
-    def SayHelloStreamReply(self, request, context):
-        i = 0
-        for _ in range(5):  # Stream "Hello" five times
-            i += 1
-            yield helloworld_pb2.HelloReply(message=f"Hello, {request.name} {i}!")
+    def SayHelloStreamServer(self, request, context):
+        requests_number = int(input("Enter number of designations:\n"))
+        for _ in range(requests_number):
+            designation = input("Enter the designation\n")
+            yield helloworld_pb2.HelloReply(message=f"Hello, {request.name} designation {designation}!")
 
-    def SayHelloStreamRequest(self, request_iterator, context):
+    def SayHelloStreamClient(self, request_iterator, context):
         name = []
         for request in request_iterator:
             name.append(request.name)
         return helloworld_pb2.HelloReply(message=f"Hello to you all {name}")
 
     def SayHelloBidiStream(self, request_iterator, context):
+        i = 0
         for request in request_iterator:
-            if request.name == 'Alice':
-                message = f"Hello, Astronaut {request.name}!"
-            elif request.name == 'Bob':
-                message = f"Hello, Doctor {request.name}!"
-            elif request.name == 'Charlie':
-                message = f"Hello, Plumber {request.name}!"
-            else:
-                message = f"Hello, {request.name}!"
+            profession = input(f"Enter the profession of {request.name}:\n")
+            message = f"Hello {request.name} the {profession}"
             yield helloworld_pb2.HelloReply(message=message)
-
 
 
 def serve():
